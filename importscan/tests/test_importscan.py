@@ -156,3 +156,21 @@ def test_attributeerror_not_handle_error():
 
     with raises(AttributeError):
         scan(attributeerror_not_handle_error, handle_error=handle_error)
+
+
+def test_package_in_zipped():
+    with zip_file_in_sys_path():
+        import packageinzipped
+
+    scan(packageinzipped)
+
+    assert fixtures.calls == 1
+
+
+def test_module_in_zipped():
+    with zip_file_in_sys_path():
+        import moduleinzipped
+
+    scan(moduleinzipped)
+
+    assert fixtures.calls == 1
