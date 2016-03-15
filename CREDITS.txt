@@ -1,0 +1,10 @@
+CREDITS
+-------
+
+importscan was written by Martijn Faassen. The core code was taken from
+Venusian_ by the Pylons project and then extensively refactored.
+
+.. _Venusian: http://docs.pylonsproject.org/projects/venusian/en/latest/
+
+importscan development was partially funded by Contact Software
+(http://contact.de).
