@@ -1,10 +1,13 @@
-import unittest
 import sys
 import re
 import os
 import contextlib
 from importscan import scan
 from . import fixtures
+
+
+# note that due to the nature of imports, we need to have a unique fixture
+# for each test
 
 
 @contextlib.contextmanager
@@ -64,3 +67,19 @@ def test_subpackage():
     scan(subpackage)
 
     assert fixtures.calls == 1
+
+
+def test_ignore_subpackage_relative():
+    from .fixtures import ignore_subpackage
+
+    scan(ignore_subpackage, ignore=['.sub'])
+
+    assert fixtures.calls == 0
+
+
+def test_ignore_subpackage_module_relative():
+    from .fixtures import ignore_subpackage_module
+
+    scan(ignore_subpackage_module, ignore=['.module'])
+
+    assert fixtures.calls == 0

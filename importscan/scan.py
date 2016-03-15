@@ -162,6 +162,7 @@ def get_is_ignored(package, ignore):
     callable_ignores = [ign for ign in ignore if callable(ign)]
 
     def is_ignored(fullname):
+        print fullname
         for ign in rel_ignores:
             if fullname.startswith(pkg_name + ign):
                 return True

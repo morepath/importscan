@@ -1,2 +1,9 @@
 .tox
+bin
+.installed
+parts
+develop-eggs
+eggs
+.installed.cfg
+doc/build
 
