@@ -17,7 +17,7 @@ except:
 
 setup(
     name='importscan',
-    version='0.1',
+    version='0.2.dev0',
     description='Recursively import modules and sub-packages',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
