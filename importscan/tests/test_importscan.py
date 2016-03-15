@@ -4,6 +4,7 @@ import os
 import contextlib
 from importscan import scan
 from . import fixtures
+from pytest import raises
 
 
 # note that due to the nature of imports, we need to have a unique fixture
@@ -116,3 +117,42 @@ def test_ignore_subpackage_module_relative():
     scan(ignore_subpackage_module, ignore=['.sub.module'])
 
     assert fixtures.calls == 0
+
+
+def test_importerror():
+    from .fixtures import importerror
+
+    with raises(ImportError):
+        scan(importerror)
+
+
+def test_attributeerror():
+    from .fixtures import attributeerror
+
+    with raises(AttributeError):
+        scan(attributeerror)
+
+
+def test_importerror_handle_error():
+    from .fixtures import importerror_handle_error
+
+    # skip import errors
+    def handle_error(name, e):
+        if not isinstance(e, ImportError):
+            raise e
+
+    scan(importerror_handle_error, handle_error=handle_error)
+
+    assert fixtures.calls == 1
+
+
+def test_attributeerror_not_handle_error():
+    from .fixtures import attributeerror_not_handle_error
+
+    # skip import errors but not attribute errors
+    def handle_error(name, e):
+        if not isinstance(e, ImportError):
+            raise e
+
+    with raises(AttributeError):
+        scan(attributeerror_not_handle_error, handle_error=handle_error)

@@ -4,7 +4,7 @@ import imp
 import sys
 
 
-def scan(package, ignore=None, onerror=None):
+def scan(package, ignore=None, handle_error=None):
     """Scan a package by importing it.
 
     A framework can provide registration decorators: a decorator that
@@ -69,24 +69,25 @@ def scan(package, ignore=None, onerror=None):
       You can also pass in a string or callable by itself as a single
       non-list argument.
 
-    :param onerror: A callback function which behaves the same way as the
-      ``onerror`` callback function described in
-      http://docs.python.org/library/pkgutil.html#pkgutil.walk_packages
-      .  By default scan propagates all errors that happen during its
-      code importing process, including :exc:`ImportError`. If you
-      use a custom ``onerror`` callback, you can change this behavior.
+    :param handle_error: A callback function that is called when an
+      exception is raised during the importing process.  By default
+      ``scan`` propagates all errors that happen during the import
+      process, including :exc:`ImportError`. If you use a custom
+      ``handle_error`` callback, you can change this behavior by not
+      reraising the error.
 
-      Here's an example ``onerror`` callback that ignores
-      :exc:`ImportError`::
+      Here's an example ``handle_error`` callback that ignores
+      :exc:`ImportError` but not any other errors::
 
-        import sys
-        def onerror(name):
-            if not issubclass(sys.exc_info()[0], ImportError):
-                raise # reraise the last exception
+        def handle_error(name, e):
+            if not isinstance(e, ImportError):
+                raise e
 
-      The ``name`` passed to ``onerror`` is the module or package
-      dotted name that could not be imported due to an exception.
-
+      The first argument passed to ``handle_error`` is the module or
+      package dotted name that could not be imported due to an
+      exception. The second argument is the exception object. If
+      ``handle_error`` does not re-raise the error, the error is
+      suppressed.
     """
     is_ignored = get_is_ignored(package, ignore)
 
@@ -98,19 +99,19 @@ def scan(package, ignore=None, onerror=None):
             package.__path__,
             package.__name__ + '.',
             is_ignored=is_ignored,
-            onerror=onerror):
+            handle_error=handle_error):
         loader = importer.find_module(modname)
         if loader is None:
             # happens on pypy with orphaned pyc
             continue
         try:
-            import_module(modname, loader, onerror)
+            import_module(modname, loader, handle_error)
         finally:
             if hasattr(loader, 'file') and hasattr(loader.file, 'close'):
                 loader.file.close()
 
 
-def import_module(modname, loader, onerror):
+def import_module(modname, loader, handle_error):
     if hasattr(loader, 'etc'):
         # python < py3.3
         module_type = loader.etc[2]
@@ -135,9 +136,9 @@ def import_module(modname, loader, onerror):
     # inappropriate double-execution of module code
     try:
         __import__(modname)
-    except Exception:
-        if onerror is not None:
-            onerror(modname)
+    except Exception, e:
+        if handle_error is not None:
+            handle_error(modname, e)
         else:
             raise
 
@@ -175,7 +176,7 @@ def get_is_ignored(package, ignore):
     return is_ignored
 
 
-def walk_packages(path=None, prefix='', is_ignored=None, onerror=None):
+def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
     """Yields (module_loader, name, ispkg) for all modules recursively
     on path, or, if path is ``None``, all accessible modules.
 
@@ -189,18 +190,22 @@ def walk_packages(path=None, prefix='', is_ignored=None, onerror=None):
     :param is_ignored: A function fed a dotted name; if it returns True,
       the package is skipped and not returned in results nor
       imported.
-    :onerror: A function which gets called with one argument (the name of
-      the package which was being imported) if any exception occurs while
-      trying to import a package.  If no onerror function is supplied, any
-      exception is exceptions propagated, terminating the search.
+    :handle_error: A function that gets called if any error occurs
+      during the importing process. If you implement ``handle_error``
+      you can choose not to re-raise the error object. It takes two
+      argument, the name of the module that could not be imported due
+      to the error, and the exception instance raised. If no
+      ``handle_error`` function is supplied, any exception is
+      propagated, terminating the search.
 
     Examples:
     # list all modules python can access
     walk_packages()
     # list all submodules of ctypes
-    walk_packages(ctypes.__path__, ctypes.__name__+'.')
+    walk_packages(ctypes.__path__, ctypes.__name__ + '.')
     # NB: we can't just use pkgutils.walk_packages because we need to ignore
     # things
+
     """
 
     def seen(p, m={}):
@@ -222,10 +227,10 @@ def walk_packages(path=None, prefix='', is_ignored=None, onerror=None):
 
         try:
             __import__(name)
-        except Exception:
-            # do any onerror handling before yielding
-            if onerror is not None:
-                onerror(name)
+        except Exception, e:
+            # do any error handling before yielding
+            if handle_error is not None:
+                handle_error(name, e)
             else:
                 raise
         else:
@@ -235,5 +240,7 @@ def walk_packages(path=None, prefix='', is_ignored=None, onerror=None):
             # don't traverse path items we've seen before
             path = [p for p in path if not seen(p)]
 
-            for item in walk_packages(path, name+'.', is_ignored, onerror):
+            for item in walk_packages(path, name + '.',
+                                      is_ignored,
+                                      handle_error):
                 yield item
