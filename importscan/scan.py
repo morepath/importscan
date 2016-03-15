@@ -136,7 +136,7 @@ def import_module(modname, loader, handle_error):
     # inappropriate double-execution of module code
     try:
         __import__(modname)
-    except Exception, e:
+    except Exception as e:
         if handle_error is not None:
             handle_error(modname, e)
         else:
@@ -227,7 +227,7 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
 
         try:
             __import__(name)
-        except Exception, e:
+        except Exception as e:
             # do any error handling before yielding
             if handle_error is not None:
                 handle_error(name, e)
