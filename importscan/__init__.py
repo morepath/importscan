@@ -1,1 +1,1 @@
-from .scan import scan
+from .scan import scan  # pragma: no cover

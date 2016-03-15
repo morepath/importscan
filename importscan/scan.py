@@ -1,5 +1,4 @@
 from .compat import is_nonstr_iter
-from inspect import getmembers
 from pkgutil import iter_modules
 import imp
 import sys
@@ -107,18 +106,17 @@ def scan(package, ignore=None, onerror=None):
             # happens on pypy with orphaned pyc
             continue
         try:
-            import_module(modname, loader)
+            import_module(modname, loader, onerror)
         finally:
-            if  (hasattr(loader, 'file') and
-                 hasattr(loader.file, 'close')):
+            if hasattr(loader, 'file') and hasattr(loader.file, 'close'):
                 loader.file.close()
 
 
-def import_module(modname, loader):
+def import_module(modname, loader, onerror):
     if hasattr(loader, 'etc'):
         # python < py3.3
         module_type = loader.etc[2]
-    else: # pragma: no cover
+    else:  # pragma: no cover
         # py3.3b2+ (importlib-using)
         module_type = imp.PY_SOURCE
         get_filename = getattr(loader, 'get_filename', None)
