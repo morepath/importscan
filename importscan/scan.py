@@ -32,13 +32,16 @@ def scan(package, ignore=None, onerror=None):
         submodules* during the scan, pass
         ``ignore=['my.package']``.
 
-      - A string representing a relative dotted name. To name an
-        object relative to the ``package`` passed to this method, use
-        a string beginning with a dot. For example, if the ``package``
-        you've passed is imported as ``my.package``, and you pass
-        ``ignore=['.mymodule']``, the ``my.package.mymodule`` mymodule
-        *and any of its submodules* are omitted during scan
-        processing.
+      - A string representing a relative dotted name, a string
+        starting with a dot. The relative module or package is
+        relative to the ``package`` being scanned, so this does *not*
+        match deeper relative packages.
+
+        For example, if the ``package`` you've passed is imported as
+        ``my.package``, and you pass ``ignore=['.mymodule']``, the
+        ``my.package.mymodule`` mymodule *and any of its submodules*
+        are omitted during scan processing. But ``my.package.sub.mymodule``
+        is *not* ignored as ``mymodule`` is nested in ``sub``.
 
       - A callable that accepts a dotted name indicating a module or a
         package as its single positional argument and returns ``True``
@@ -99,7 +102,7 @@ def scan(package, ignore=None, onerror=None):
     for importer, modname, ispkg in walk_packages(
             package.__path__,
             package.__name__ + '.',
-            ignore=is_ignored,
+            is_ignored=is_ignored,
             onerror=onerror):
         loader = importer.find_module(modname)
         if loader is None:
@@ -162,7 +165,6 @@ def get_is_ignored(package, ignore):
     callable_ignores = [ign for ign in ignore if callable(ign)]
 
     def is_ignored(fullname):
-        print fullname
         for ign in rel_ignores:
             if fullname.startswith(pkg_name + ign):
                 return True
@@ -178,7 +180,7 @@ def get_is_ignored(package, ignore):
     return is_ignored
 
 
-def walk_packages(path=None, prefix='', ignore=None, onerror=None):
+def walk_packages(path=None, prefix='', is_ignored=None, onerror=None):
     """Yields (module_loader, name, ispkg) for all modules recursively
     on path, or, if path is ``None``, all accessible modules.
 
@@ -189,7 +191,7 @@ def walk_packages(path=None, prefix='', ignore=None, onerror=None):
     :param path: A list of paths to look for modules in, or `None`.
     :param prefix: A string to output on the front of every module name
       on output.
-    :param ignore: A function fed a dotted name; if it returns True,
+    :param is_ignored: A function fed a dotted name; if it returns True,
       the package is skipped and not returned in results nor
       imported.
     :onerror: A function which gets called with one argument (the name of
@@ -207,14 +209,14 @@ def walk_packages(path=None, prefix='', ignore=None, onerror=None):
     """
 
     def seen(p, m={}):
-        if p in m: # pragma: no cover
+        if p in m:  # pragma: no cover
             return True
         m[p] = True
 
     # iter_modules is nonrecursive
     for importer, name, ispkg in iter_modules(path, prefix):
 
-        if ignore is not None and ignore(name):
+        if is_ignored is not None and is_ignored(name):
             # if name is a package, ignoring here causes
             # all subpackages and submodules to be ignored too
             continue
@@ -236,7 +238,7 @@ def walk_packages(path=None, prefix='', ignore=None, onerror=None):
                 # don't traverse path items we've seen before
                 path = [p for p in path if not seen(p)]
 
-                for item in walk_packages(path, name+'.', onerror, ignore):
+                for item in walk_packages(path, name+'.', is_ignored, onerror):
                     yield item
         else:
             yield importer, name, ispkg
