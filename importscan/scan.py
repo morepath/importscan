@@ -53,11 +53,6 @@ def scan(package, ignore=None, onerror=None):
         ignored, if it returns ``False`` (or anything else falsy) the
         object is not ignored.
 
-        *Note that unlike string matches, ignores that use a callable
-        don't cause submodules of a package represented by a dotted
-        name to also be ignored, they match individual modules and packages
-        found during a scan*.
-
       You can mix and match the three types of strings in the list.
       For example, if the package being scanned is ``my``,
       ``ignore=['my.package', '.someothermodule',
@@ -221,24 +216,24 @@ def walk_packages(path=None, prefix='', is_ignored=None, onerror=None):
             # all subpackages and submodules to be ignored too
             continue
 
-        # do any onerror handling before yielding
+        if not ispkg:
+            yield importer, name, ispkg
+            continue
 
-        if ispkg:
-            try:
-                __import__(name)
-            except Exception:
-                if onerror is not None:
-                    onerror(name)
-                else:
-                    raise
+        try:
+            __import__(name)
+        except Exception:
+            # do any onerror handling before yielding
+            if onerror is not None:
+                onerror(name)
             else:
-                yield importer, name, ispkg
-                path = getattr(sys.modules[name], '__path__', None) or []
-
-                # don't traverse path items we've seen before
-                path = [p for p in path if not seen(p)]
-
-                for item in walk_packages(path, name+'.', is_ignored, onerror):
-                    yield item
+                raise
         else:
             yield importer, name, ispkg
+            path = getattr(sys.modules[name], '__path__', None) or []
+
+            # don't traverse path items we've seen before
+            path = [p for p in path if not seen(p)]
+
+            for item in walk_packages(path, name+'.', is_ignored, onerror):
+                yield item

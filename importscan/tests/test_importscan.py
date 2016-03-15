@@ -86,11 +86,10 @@ def test_ignore_module_absolute():
     assert fixtures.calls == 0
 
 
-def test_ignore_module_funmction():
+def test_ignore_module_function():
     from .fixtures import ignore_module_function
 
-    scan(ignore_module_function,
-         ignore=re.compile('module$').search)
+    scan(ignore_module_function, ignore=re.compile('module$').search)
 
     assert fixtures.calls == 0
 
@@ -99,6 +98,14 @@ def test_ignore_subpackage_relative():
     from .fixtures import ignore_subpackage
 
     scan(ignore_subpackage, ignore=['.sub'])
+
+    assert fixtures.calls == 0
+
+
+def test_ignore_subpackage_function():
+    from .fixtures import ignore_subpackage_function
+
+    scan(ignore_subpackage_function, ignore=re.compile('sub$').search)
 
     assert fixtures.calls == 0
 
