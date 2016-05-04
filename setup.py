@@ -1,25 +1,16 @@
-import os
+import io
+from setuptools import setup, find_packages
 
-from setuptools import setup
-from setuptools import find_packages
-
-here = os.path.abspath(os.path.dirname(__file__))
-
-try:
-    with open(os.path.join(here, 'README.rst')) as f:
-        README = f.read()
-    with open(os.path.join(here, 'CHANGES.rst')) as f:
-        CHANGES = f.read()
-except:
-    README = ''
-    CHANGES = ''
-
+long_description = '\n'.join((
+    io.open('README.rst', encoding='utf-8').read(),
+    io.open('CHANGES.txt', encoding='utf-8').read()
+))
 
 setup(
     name='importscan',
     version='0.2.dev0',
     description='Recursively import modules and sub-packages',
-    long_description=README + '\n\n' + CHANGES,
+    long_description=long_description,
     classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python",
