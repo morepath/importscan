@@ -25,6 +25,7 @@ setup(
     keywords='decorator import package',
     author="Martijn Faassen",
     author_email="faassen@startifact.com",
+    url="http://importscan.readthedocs.io",
     license="BSD",
     packages=find_packages(),
     include_package_data=True,
