@@ -4,7 +4,7 @@ CHANGES
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Dropped support for Python 2.6 and added support for Python 3.5.
 
 
 0.1 (2016-03-15)
