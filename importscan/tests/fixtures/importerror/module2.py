@@ -1,1 +1,1 @@
-from .  import certainlynotthere
+from . import certainlynotthere  # noqa
