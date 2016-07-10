@@ -14,4 +14,4 @@ else:  # pragma: no cover
 if PY3:
     INT_TYPES = (int,)
 else:  # pragma: no cover
-    INT_TYPES = (int, long)
+    INT_TYPES = (int, long)  # noqa
