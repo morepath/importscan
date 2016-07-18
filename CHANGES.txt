@@ -6,6 +6,7 @@ CHANGES
 
 - Dropped support for Python 2.6 and added support for Python 3.5.
 
+- Make Python 3.5 the default testing environment.
 
 0.1 (2016-03-15)
 ----------------

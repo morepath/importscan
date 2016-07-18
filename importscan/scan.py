@@ -101,7 +101,7 @@ def scan(package, ignore=None, handle_error=None):
             is_ignored=is_ignored,
             handle_error=handle_error):
         loader = importer.find_module(modname)
-        if loader is None:
+        if loader is None:  # pragma: no cover
             # happens on pypy with orphaned pyc
             continue
         try:
@@ -112,10 +112,10 @@ def scan(package, ignore=None, handle_error=None):
 
 
 def import_module(modname, loader, handle_error):
-    if hasattr(loader, 'etc'):
+    if hasattr(loader, 'etc'):  # pragma: no cover
         # python < py3.3
         module_type = loader.etc[2]
-    else:  # pragma: no cover
+    else:
         # py3.3b2+ (importlib-using)
         module_type = imp.PY_SOURCE
         get_filename = getattr(loader, 'get_filename', None)
