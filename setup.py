@@ -35,9 +35,15 @@ setup(
         'setuptools'
     ],
     extras_require=dict(
-        test=['pytest >= 2.5.2',
-              'py >= 1.4.20',
-              'pytest-cov',
-              'pytest-remove-stale-bytecode'],
+        test=[
+            'pytest >= 2.9.0',
+            'pytest-remove-stale-bytecode',
+        ],
+        coverage=[
+            'pytest-cov',
+        ],
+        pep8=[
+            'flake8',
+        ],
     )
 )

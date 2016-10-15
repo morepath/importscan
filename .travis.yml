@@ -10,6 +10,7 @@ env:
     - TOXENV=coverage
     - TOXENV=pep8
 install:
+    - pip install --upgrade pip setuptools
     - pip install tox
 script:
     - tox -e $TOXENV
