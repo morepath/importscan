@@ -8,6 +8,16 @@ CHANGES
 
 - Make Python 3.5 the default testing environment.
 
+- Use virtualenv and pip instead of buildout to set up the
+  development environment.
+
+- Add development documentation and reorganize documentation.
+
+- Upload universal wheels to pypi during release.
+
+- Clean up the development and release workflow.
+
+
 0.1 (2016-03-15)
 ----------------
 
