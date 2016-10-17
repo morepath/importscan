@@ -1,0 +1,10 @@
+# development
+-e '.[test,coverage,pep8]'
+tox >= 2.4.1
+radon
+
+# documentation
+sphinx
+
+# releaser
+zest.releaser[recommended]

@@ -1,16 +1,15 @@
-.. importscan documentation master file, created by
-   sphinx-quickstart on Tue Mar 15 14:21:46 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+importscan: recursively import Python packages
+==============================================
 
-importscan
-==========
+``importscan`` provides a ``scan`` function that lets you recursively
+import a package and its sub-modules and sub-packages.
 
-.. py:module:: importscan
+.. toctree::
+   :maxdepth: 2
 
-.. autofunction:: scan
-
-.. include:: ../CHANGES.txt
+   api
+   developing
+   changes
 
 Indices and tables
 ==================
@@ -18,4 +17,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
