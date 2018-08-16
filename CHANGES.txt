@@ -17,6 +17,7 @@ CHANGES
 
 - Clean up the development and release workflow.
 
+- add support for passing a module name as string to enable ``scan(__name__)``
 
 0.1 (2016-03-15)
 ----------------

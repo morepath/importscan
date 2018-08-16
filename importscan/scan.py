@@ -20,6 +20,7 @@ def scan(package, ignore=None, handle_error=None):
     decorators.
 
     :param package: A reference to a Python package or module object.
+                    if a string is given its imported
 
     :param ignore: Ignore certain modules or packages during a scan. It
       should be a sequence containing strings and/or callables that
@@ -89,6 +90,11 @@ def scan(package, ignore=None, handle_error=None):
       ``handle_error`` does not re-raise the error, the error is
       suppressed.
     """
+    # module name instead of package object
+    if not hasattr(package, '__name__'):
+        __import__(package)
+        package = sys.modules[package]
+
     is_ignored = get_is_ignored(package, ignore)
 
     # not a package but a module

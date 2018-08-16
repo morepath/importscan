@@ -174,3 +174,7 @@ def test_module_in_zipped():
     scan(moduleinzipped)
 
     assert fixtures.calls == 1
+
+
+def test_scan_from_name():
+    scan('email')
