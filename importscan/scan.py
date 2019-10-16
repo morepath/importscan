@@ -1,4 +1,3 @@
-from .compat import is_nonstr_iter
 from pkgutil import iter_modules
 import imp
 import sys
@@ -112,21 +111,17 @@ def scan(package, ignore=None, handle_error=None):
 
 
 def import_module(modname, loader, handle_error):
-    if hasattr(loader, 'etc'):  # pragma: no cover
-        # python < py3.3
-        module_type = loader.etc[2]
-    else:
-        # py3.3b2+ (importlib-using)
-        module_type = imp.PY_SOURCE
-        get_filename = getattr(loader, 'get_filename', None)
-        if get_filename is None:
-            get_filename = loader._get_filename
-        try:
-            fn = get_filename(modname)
-        except TypeError:
-            fn = get_filename()
-        if fn.endswith(('.pyc', '.pyo', '$py.class')):
-            module_type = imp.PY_COMPILED
+    module_type = imp.PY_SOURCE
+    get_filename = getattr(loader, 'get_filename', None)
+    if get_filename is None:
+        get_filename = loader._get_filename
+    try:
+        fn = get_filename(modname)
+    except TypeError:
+        fn = get_filename()
+    if fn.endswith(('.pyc', '.pyo', '$py.class')):
+        module_type = imp.PY_COMPILED
+
     # only scan non-orphaned source files and package directories
     if module_type not in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
         return
@@ -145,6 +140,11 @@ def import_module(modname, loader, handle_error):
 
 def get_is_ignored(package, ignore):
     pkg_name = package.__name__
+
+    def is_nonstr_iter(v):
+        if isinstance(v, str):  # pragma: no cover
+            return False
+        return hasattr(v, '__iter__')
 
     if ignore is None:
         ignore = []
