@@ -1,5 +1,4 @@
 from pkgutil import iter_modules
-import imp
 import sys
 
 
@@ -99,7 +98,11 @@ def scan(package, ignore=None, handle_error=None):
             package.__name__ + '.',
             is_ignored=is_ignored,
             handle_error=handle_error):
-        loader = importer.find_module(modname)
+        try:
+            loader = importer.find_spec(modname).loader
+        except AttributeError:
+            # zipimport.zipimporter doesn't have find_spec
+            loader = importer.find_module(modname)
         if loader is None:  # pragma: no cover
             # happens on pypy with orphaned pyc
             continue
@@ -111,7 +114,6 @@ def scan(package, ignore=None, handle_error=None):
 
 
 def import_module(modname, loader, handle_error):
-    module_type = imp.PY_SOURCE
     get_filename = getattr(loader, 'get_filename', None)
     if get_filename is None:
         get_filename = loader._get_filename
@@ -119,11 +121,8 @@ def import_module(modname, loader, handle_error):
         fn = get_filename(modname)
     except TypeError:
         fn = get_filename()
-    if fn.endswith(('.pyc', '.pyo', '$py.class')):
-        module_type = imp.PY_COMPILED
-
     # only scan non-orphaned source files and package directories
-    if module_type not in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
+    if fn.endswith(('.pyc', '.pyo', '$py.class')):
         return
 
     # NB: use __import__(modname) rather than
