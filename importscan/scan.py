@@ -176,7 +176,7 @@ def get_is_ignored(package, ignore):
 
 
 def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
-    """Yields (module_loader, name, ispkg) for all modules recursively
+    """Yields (module_finder, name, ispkg) for all modules recursively
     on path, or, if path is ``None``, all accessible modules.
 
     Note that this function must import all *packages* (NOT all
@@ -213,7 +213,7 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
         m[p] = True
 
     # iter_modules is nonrecursive
-    for importer, name, ispkg in iter_modules(path, prefix):
+    for (module_finder, name, ispkg) in iter_modules(path, prefix):
 
         if is_ignored is not None and is_ignored(name):
             # if name is a package, ignoring here causes
@@ -221,7 +221,7 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
             continue
 
         if not ispkg:
-            yield importer, name, ispkg
+            yield (module_finder, name, ispkg)
             continue
 
         try:
@@ -233,13 +233,11 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
             else:
                 raise
         else:
-            yield importer, name, ispkg
+            yield (module_finder, name, ispkg)
             path = getattr(sys.modules[name], '__path__', None) or []
 
             # don't traverse path items we've seen before
             path = [p for p in path if not seen(p)]
 
-            for item in walk_packages(path, name + '.',
-                                      is_ignored,
-                                      handle_error):
-                yield item
+            yield from walk_packages(path, name + '.',
+                                     is_ignored, handle_error)
