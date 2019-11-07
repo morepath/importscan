@@ -103,9 +103,6 @@ def scan(package, ignore=None, handle_error=None):
         except AttributeError:
             # zipimport.zipimporter doesn't have find_spec
             loader = importer.find_module(modname)
-        if loader is None:  # pragma: no cover
-            # happens on pypy with orphaned pyc
-            continue
         try:
             import_module(modname, loader, handle_error)
         finally:
