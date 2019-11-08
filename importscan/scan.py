@@ -1,6 +1,4 @@
-from .compat import is_nonstr_iter
 from pkgutil import iter_modules
-import imp
 import sys
 
 
@@ -100,10 +98,11 @@ def scan(package, ignore=None, handle_error=None):
             package.__name__ + '.',
             is_ignored=is_ignored,
             handle_error=handle_error):
-        loader = importer.find_module(modname)
-        if loader is None:  # pragma: no cover
-            # happens on pypy with orphaned pyc
-            continue
+        try:
+            loader = importer.find_spec(modname).loader
+        except AttributeError:
+            # zipimport.zipimporter doesn't have find_spec
+            loader = importer.find_module(modname)
         try:
             import_module(modname, loader, handle_error)
         finally:
@@ -112,23 +111,15 @@ def scan(package, ignore=None, handle_error=None):
 
 
 def import_module(modname, loader, handle_error):
-    if hasattr(loader, 'etc'):  # pragma: no cover
-        # python < py3.3
-        module_type = loader.etc[2]
-    else:
-        # py3.3b2+ (importlib-using)
-        module_type = imp.PY_SOURCE
-        get_filename = getattr(loader, 'get_filename', None)
-        if get_filename is None:
-            get_filename = loader._get_filename
-        try:
-            fn = get_filename(modname)
-        except TypeError:
-            fn = get_filename()
-        if fn.endswith(('.pyc', '.pyo', '$py.class')):
-            module_type = imp.PY_COMPILED
+    get_filename = getattr(loader, 'get_filename', None)
+    if get_filename is None:
+        get_filename = loader._get_filename
+    try:
+        fn = get_filename(modname)
+    except TypeError:
+        fn = get_filename()
     # only scan non-orphaned source files and package directories
-    if module_type not in (imp.PY_SOURCE, imp.PKG_DIRECTORY):
+    if fn.endswith(('.pyc', '.pyo', '$py.class')):
         return
 
     # NB: use __import__(modname) rather than
@@ -145,6 +136,11 @@ def import_module(modname, loader, handle_error):
 
 def get_is_ignored(package, ignore):
     pkg_name = package.__name__
+
+    def is_nonstr_iter(v):
+        if isinstance(v, str):  # pragma: no cover
+            return False
+        return hasattr(v, '__iter__')
 
     if ignore is None:
         ignore = []
@@ -177,7 +173,7 @@ def get_is_ignored(package, ignore):
 
 
 def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
-    """Yields (module_loader, name, ispkg) for all modules recursively
+    """Yields (module_finder, name, ispkg) for all modules recursively
     on path, or, if path is ``None``, all accessible modules.
 
     Note that this function must import all *packages* (NOT all
@@ -214,7 +210,7 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
         m[p] = True
 
     # iter_modules is nonrecursive
-    for importer, name, ispkg in iter_modules(path, prefix):
+    for (module_finder, name, ispkg) in iter_modules(path, prefix):
 
         if is_ignored is not None and is_ignored(name):
             # if name is a package, ignoring here causes
@@ -222,7 +218,7 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
             continue
 
         if not ispkg:
-            yield importer, name, ispkg
+            yield (module_finder, name, ispkg)
             continue
 
         try:
@@ -234,13 +230,11 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
             else:
                 raise
         else:
-            yield importer, name, ispkg
+            yield (module_finder, name, ispkg)
             path = getattr(sys.modules[name], '__path__', None) or []
 
             # don't traverse path items we've seen before
             path = [p for p in path if not seen(p)]
 
-            for item in walk_packages(path, name + '.',
-                                      is_ignored,
-                                      handle_error):
-                yield item
+            yield from walk_packages(path, name + '.',
+                                     is_ignored, handle_error)

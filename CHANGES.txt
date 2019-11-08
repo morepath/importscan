@@ -4,9 +4,17 @@ CHANGES
 0.2 (unreleased)
 ----------------
 
-- Dropped support for Python 2.6 and added support for Python 3.5.
+- **Removed**: Removed support for Python 2.
+  
+  You have to upgrade to Python 3 if you want to use this version.
 
-- Make Python 3.5 the default testing environment.
+- Dropped support for Python 3.3 
+
+- Added support for Python 3.5, 3.6, 3.7, 3.8 and PyPy 3.6.
+
+- Make Python 3.7 the default testing environment.
+
+- Fix deprecated and legacy code.
 
 - Use virtualenv and pip instead of buildout to set up the
   development environment.
