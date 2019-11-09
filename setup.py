@@ -34,8 +34,8 @@ setup(
     zip_safe=False,
     install_requires=["setuptools"],
     extras_require=dict(
-        test=["pytest >= 2.9.0", "pytest-remove-stale-bytecode",],
-        coverage=["pytest-cov",],
-        pep8=["flake8", "black",],
+        test=["pytest >= 2.9.0", "pytest-remove-stale-bytecode"],
+        coverage=["pytest-cov"],
+        pep8=["flake8", "black"],
     ),
 )

@@ -21,8 +21,9 @@ def with_entry_in_sys_path(entry):
 
 def zip_file_in_sys_path():
     """Context manager that puts zipped.zip at head of sys.path"""
-    zip_pkg_path = os.path.join(os.path.dirname(__file__),
-                                'fixtures', 'zipped.zip')
+    zip_pkg_path = os.path.join(
+        os.path.dirname(__file__), "fixtures", "zipped.zip"
+    )
     return with_entry_in_sys_path(zip_pkg_path)
 
 
@@ -73,7 +74,7 @@ def test_subpackage():
 def test_ignore_module_relative():
     from .fixtures import ignore_module
 
-    scan(ignore_module, ignore=['.module'])
+    scan(ignore_module, ignore=[".module"])
 
     assert fixtures.calls == 0
 
@@ -81,8 +82,10 @@ def test_ignore_module_relative():
 def test_ignore_module_absolute():
     from .fixtures import ignore_module_absolute
 
-    scan(ignore_module_absolute,
-         ignore=['importscan.tests.fixtures.ignore_module_absolute.module'])
+    scan(
+        ignore_module_absolute,
+        ignore=["importscan.tests.fixtures.ignore_module_absolute.module"],
+    )
 
     assert fixtures.calls == 0
 
@@ -90,7 +93,7 @@ def test_ignore_module_absolute():
 def test_ignore_module_function():
     from .fixtures import ignore_module_function
 
-    scan(ignore_module_function, ignore=re.compile('module$').search)
+    scan(ignore_module_function, ignore=re.compile("module$").search)
 
     assert fixtures.calls == 0
 
@@ -98,7 +101,7 @@ def test_ignore_module_function():
 def test_ignore_subpackage_relative():
     from .fixtures import ignore_subpackage
 
-    scan(ignore_subpackage, ignore=['.sub'])
+    scan(ignore_subpackage, ignore=[".sub"])
 
     assert fixtures.calls == 0
 
@@ -106,7 +109,7 @@ def test_ignore_subpackage_relative():
 def test_ignore_subpackage_function():
     from .fixtures import ignore_subpackage_function
 
-    scan(ignore_subpackage_function, ignore=re.compile('sub$').search)
+    scan(ignore_subpackage_function, ignore=re.compile("sub$").search)
 
     assert fixtures.calls == 0
 
@@ -114,7 +117,7 @@ def test_ignore_subpackage_function():
 def test_ignore_subpackage_module_relative():
     from .fixtures import ignore_subpackage_module
 
-    scan(ignore_subpackage_module, ignore=['.sub.module'])
+    scan(ignore_subpackage_module, ignore=[".sub.module"])
 
     assert fixtures.calls == 0
 
