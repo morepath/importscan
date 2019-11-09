@@ -25,6 +25,8 @@ CHANGES
 
 - Clean up the development and release workflow.
 
+- Add integration for the Black code formatter.
+
 
 0.1 (2016-03-15)
 ----------------
