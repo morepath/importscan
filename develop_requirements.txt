@@ -1,5 +1,6 @@
 # development
 -e '.[test,coverage,pep8]'
+pre-commit
 tox >= 2.4.1
 radon
 

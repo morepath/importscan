@@ -90,14 +90,15 @@ def scan(package, ignore=None, handle_error=None):
     is_ignored = get_is_ignored(package, ignore)
 
     # not a package but a module
-    if not hasattr(package, '__path__'):
+    if not hasattr(package, "__path__"):
         return
 
     for importer, modname, ispkg in walk_packages(
-            package.__path__,
-            package.__name__ + '.',
-            is_ignored=is_ignored,
-            handle_error=handle_error):
+        package.__path__,
+        package.__name__ + ".",
+        is_ignored=is_ignored,
+        handle_error=handle_error,
+    ):
         try:
             loader = importer.find_spec(modname).loader
         except AttributeError:
@@ -106,12 +107,12 @@ def scan(package, ignore=None, handle_error=None):
         try:
             import_module(modname, loader, handle_error)
         finally:
-            if hasattr(loader, 'file') and hasattr(loader.file, 'close'):
+            if hasattr(loader, "file") and hasattr(loader.file, "close"):
                 loader.file.close()
 
 
 def import_module(modname, loader, handle_error):
-    get_filename = getattr(loader, 'get_filename', None)
+    get_filename = getattr(loader, "get_filename", None)
     if get_filename is None:
         get_filename = loader._get_filename
     try:
@@ -119,7 +120,7 @@ def import_module(modname, loader, handle_error):
     except TypeError:
         fn = get_filename()
     # only scan non-orphaned source files and package directories
-    if fn.endswith(('.pyc', '.pyo', '$py.class')):
+    if fn.endswith((".pyc", ".pyo", "$py.class")):
         return
 
     # NB: use __import__(modname) rather than
@@ -140,7 +141,7 @@ def get_is_ignored(package, ignore):
     def is_nonstr_iter(v):
         if isinstance(v, str):  # pragma: no cover
             return False
-        return hasattr(v, '__iter__')
+        return hasattr(v, "__iter__")
 
     if ignore is None:
         ignore = []
@@ -150,9 +151,9 @@ def get_is_ignored(package, ignore):
     # non-leading-dotted name absolute object name
     str_ignores = [ign for ign in ignore if isinstance(ign, str)]
     # leading dotted name relative to scanned package
-    rel_ignores = [ign for ign in str_ignores if ign.startswith('.')]
+    rel_ignores = [ign for ign in str_ignores if ign.startswith(".")]
     # non-leading dotted names
-    abs_ignores = [ign for ign in str_ignores if not ign.startswith('.')]
+    abs_ignores = [ign for ign in str_ignores if not ign.startswith(".")]
     # functions, e.g. re.compile('pattern').search
     callable_ignores = [ign for ign in ignore if callable(ign)]
 
@@ -172,7 +173,7 @@ def get_is_ignored(package, ignore):
     return is_ignored
 
 
-def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
+def walk_packages(path=None, prefix="", is_ignored=None, handle_error=None):
     """Yields (module_finder, name, ispkg) for all modules recursively
     on path, or, if path is ``None``, all accessible modules.
 
@@ -231,10 +232,9 @@ def walk_packages(path=None, prefix='', is_ignored=None, handle_error=None):
                 raise
         else:
             yield (module_finder, name, ispkg)
-            path = getattr(sys.modules[name], '__path__', None) or []
+            path = getattr(sys.modules[name], "__path__", None) or []
 
             # don't traverse path items we've seen before
             path = [p for p in path if not seen(p)]
 
-            yield from walk_packages(path, name + '.',
-                                     is_ignored, handle_error)
+            yield from walk_packages(path, name + ".", is_ignored, handle_error)
