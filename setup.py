@@ -10,7 +10,7 @@ long_description = "\n".join(
 
 setup(
     name="importscan",
-    version="0.2",
+    version="0.3.dev0",
     description="Recursively import modules and sub-packages",
     long_description=long_description,
     classifiers=[
