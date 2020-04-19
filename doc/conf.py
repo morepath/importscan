@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # importscan documentation build configuration file, created by
 # sphinx-quickstart on Tue Mar 15 14:21:46 2016.
 #
