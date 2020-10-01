@@ -1,8 +1,9 @@
 importscan: recursively import Python packages
 ==============================================
 
-``importscan`` provides a ``scan`` function that lets you recursively
-import a package and its sub-modules and sub-packages.
+``import scan`` provides a ``scan`` function that lets you recursively
+import a package and its sub-modules and sub-packages.and for more information 
+go to click on Documention.
 
 Documentation_.
 
