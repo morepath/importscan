@@ -18,6 +18,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
@@ -33,6 +34,5 @@ setup(
     extras_require=dict(
         test=["pytest >= 2.9.0", "pytest-remove-stale-bytecode"],
         coverage=["pytest-cov"],
-        pep8=["flake8", "black"],
     ),
 )
