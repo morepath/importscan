@@ -4,13 +4,13 @@ CHANGES
 0.3 (unreleased)
 ----------------
 
-- Drop support for Python 3.4 and 3.5.
+- Add support for Python 3.10 - 3.14.
+
+- Drop support for Python 3.9 and below.
 
 - Fix Flake8 errors.
 
 - Use GitHub Actions for CI.
-
-- Add support for Python 3.9.
 
 
 0.2 (2020-01-29)
