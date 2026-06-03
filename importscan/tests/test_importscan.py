@@ -6,7 +6,6 @@ from importscan import scan
 from . import fixtures
 from pytest import raises
 
-
 # note that due to the nature of imports, we need to have a unique fixture
 # for each test
 
