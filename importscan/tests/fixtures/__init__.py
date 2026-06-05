@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 calls = 0
 
 
-def call():
+def call() -> None:
     global calls
     calls += 1
 
 
-def reset():
+def reset() -> None:
     global calls
     calls = 0
