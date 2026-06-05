@@ -1,8 +1,22 @@
-from pkgutil import iter_modules
+from __future__ import annotations
+
 import sys
+from pkgutil import iter_modules
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator, Iterable
+    from importlib.abc import Loader
+    from types import ModuleType
+    from typing_extensions import TypeIs
+    from importscan.types import IgnoreModule, ModuleInfo, StrOrBytesPath
 
 
-def scan(package, ignore=None, handle_error=None):
+def scan(
+    package: ModuleType,
+    ignore: Iterable[IgnoreModule] | IgnoreModule | None = None,
+    handle_error: Callable[[str, Exception], object] | None = None,
+) -> None:
     """Scan a package by importing it.
 
     A framework can provide registration decorators: a decorator that
@@ -99,22 +113,39 @@ def scan(package, ignore=None, handle_error=None):
         is_ignored=is_ignored,
         handle_error=handle_error,
     ):
-        try:
-            loader = importer.find_spec(modname).loader
-        except AttributeError:
-            # zipimport.zipimporter doesn't have find_spec
-            loader = importer.find_module(modname)
+        # FIXME: Add support for MetaPathFinder? But how would that work?
+        #        What path do we pass in to get the correct result?
+        #        We probably would need to remember the value of path we passed
+        #        into iter_modules for submodules/subpackages. There's also
+        #        the additional issue that not all finders will implement the
+        #        non-standard iter_modules method, but without it there's
+        #        no way to list all of the modules. Also since walk_packages
+        #        already imports all of the packages, why are we importing
+        #        them again here? Shouldn't we only import modules here?
+        #        Also why do we do only use `import_module` here, but not
+        #        in `walk_packages`? Doesn't that mean that the additional
+        #        check in `import_module` doesn't do anything for packages?
+        loader = importer.find_spec(modname).loader  # type: ignore
+        assert loader is not None
+
         try:
             import_module(modname, loader, handle_error)
         finally:
-            if hasattr(loader, "file") and hasattr(loader.file, "close"):
-                loader.file.close()
+            if hasattr(loader, "file") and hasattr(
+                loader.file,  # pyright: ignore[reportAttributeAccessIssue]
+                "close",
+            ):
+                loader.file.close()  # pyright: ignore[reportAttributeAccessIssue]
 
 
-def import_module(modname, loader, handle_error):
+def import_module(
+    modname: str,
+    loader: Loader,
+    handle_error: Callable[[str, Exception], object] | None,
+) -> None:
     get_filename = getattr(loader, "get_filename", None)
     if get_filename is None:
-        get_filename = loader._get_filename
+        get_filename = loader._get_filename  # type: ignore[attr-defined]
     try:
         fn = get_filename(modname)
     except TypeError:
@@ -135,10 +166,13 @@ def import_module(modname, loader, handle_error):
             raise
 
 
-def get_is_ignored(package, ignore):
+def get_is_ignored(
+    package: ModuleType, ignore: Iterable[IgnoreModule] | IgnoreModule | None
+) -> Callable[[str], bool]:
+
     pkg_name = package.__name__
 
-    def is_nonstr_iter(v):
+    def is_nonstr_iter(v: object) -> TypeIs[Iterable[IgnoreModule]]:
         if isinstance(v, str):  # pragma: no cover
             return False
         return hasattr(v, "__iter__")
@@ -157,7 +191,7 @@ def get_is_ignored(package, ignore):
     # functions, e.g. re.compile('pattern').search
     callable_ignores = [ign for ign in ignore if callable(ign)]
 
-    def is_ignored(fullname):
+    def is_ignored(fullname: str) -> bool:
         for ign in rel_ignores:
             if fullname.startswith(pkg_name + ign):
                 return True
@@ -165,15 +199,20 @@ def get_is_ignored(package, ignore):
             # non-leading-dotted name absolute object name
             if fullname.startswith(ign):
                 return True
-        for ign in callable_ignores:
-            if ign(fullname):
+        for ign_fn in callable_ignores:
+            if ign_fn(fullname):
                 return True
         return False
 
     return is_ignored
 
 
-def walk_packages(path=None, prefix="", is_ignored=None, handle_error=None):
+def walk_packages(
+    path: Iterable[StrOrBytesPath] | None = None,
+    prefix: str = "",
+    is_ignored: Callable[[str], bool] | None = None,
+    handle_error: Callable[[str, Exception], object] | None = None,
+) -> Generator[ModuleInfo]:
     """Yields (module_finder, name, ispkg) for all modules recursively
     on path, or, if path is ``None``, all accessible modules.
 
@@ -205,10 +244,11 @@ def walk_packages(path=None, prefix="", is_ignored=None, handle_error=None):
 
     """
 
-    def seen(p, m={}):
+    def seen(p: str, m: set[str] = set()) -> bool:
         if p in m:  # pragma: no cover
             return True
-        m[p] = True
+        m.add(p)
+        return False
 
     # iter_modules is nonrecursive
     for module_finder, name, ispkg in iter_modules(path, prefix):
@@ -235,6 +275,6 @@ def walk_packages(path=None, prefix="", is_ignored=None, handle_error=None):
             path = getattr(sys.modules[name], "__path__", None) or []
 
             # don't traverse path items we've seen before
-            path = [p for p in path if not seen(p)]
+            path = [p for p in path if not seen(p)]  # pyright: ignore
 
             yield from walk_packages(path, name + ".", is_ignored, handle_error)

@@ -1,1 +1,3 @@
-from .scan import scan  # noqa
+from .scan import scan
+
+__all__ = ("scan",)
