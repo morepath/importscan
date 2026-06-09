@@ -43,6 +43,9 @@ pyright = ["pyright", "pytest"]
 [tool.setuptools.packages]
 find = {}
 
+[tool.setuptools.package-data]
+importscan = ["py.typed"]
+
 [tool.setuptools.dynamic]
 readme = {file = ["README.rst", "CHANGES.txt"]}
 
