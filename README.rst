@@ -20,4 +20,4 @@ import a package and its sub-modules and sub-packages.
 
 Documentation_.
 
-.. _Documentation: http://importscan.readthedocs.org
+.. _Documentation: https://importscan.readthedocs.org
