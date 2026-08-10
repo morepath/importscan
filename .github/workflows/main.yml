@@ -34,7 +34,7 @@ jobs:
         run: "python -m tox"
 
       - name: "Report to coveralls"
-        # coverage is only created in the py39 environment
+        # coverage is only created in the py314 environment
         # --service=github is a workaround for bug
         # https://github.com/coveralls-clients/coveralls-python/issues/251
         if: "matrix.python-version == '3.14'"
