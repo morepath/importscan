@@ -1,11 +1,8 @@
 # development
--e '.[test,coverage,lint]'
+-e '.[test,coverage,lint,docs,mypy,pyright]'
 pre-commit
 tox >= 4
 radon
-
-# documentation
-sphinx
 
 # releaser
 zest.releaser[recommended]
