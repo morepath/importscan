@@ -108,7 +108,7 @@ def scan(
     if not hasattr(package, "__path__"):
         return
 
-    for importer, modname, _ispkg in walk_packages(
+    for importer, modname, ispkg in walk_packages(
         package.__path__,
         package.__name__ + ".",
         is_ignored=is_ignored,
@@ -120,12 +120,14 @@ def scan(
         #        into iter_modules for submodules/subpackages. There's also
         #        the additional issue that not all finders will implement the
         #        non-standard iter_modules method, but without it there's
-        #        no way to list all of the modules. Also since walk_packages
-        #        already imports all of the packages, why are we importing
-        #        them again here? Shouldn't we only import modules here?
-        #        Also why do we do only use `import_module` here, but not
-        #        in `walk_packages`? Doesn't that mean that the additional
-        #        check in `import_module` doesn't do anything for packages?
+        #        no way to list all of the modules.
+        #
+        # Note: Packages are already imported in walk_packages() to access
+        # their __path__ for recursion and have already been error-checked.
+        # Only modules need to be imported here.
+        if ispkg:
+            continue
+
         spec = importer.find_spec(modname, None)
         loader = spec.loader if spec else None
         assert loader is not None
