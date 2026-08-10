@@ -5,10 +5,14 @@ import os
 import re
 import sys
 from typing import TYPE_CHECKING
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pytest import raises
+
 from importscan import scan
+from importscan.scan import import_module
+
 from . import fixtures
 
 if TYPE_CHECKING:
@@ -185,3 +189,85 @@ def test_module_in_zipped() -> None:
     scan(moduleinzipped)
 
     assert fixtures.calls == 1
+
+
+def test_scan_loader_file_close() -> None:
+    # __init__.py overwrites the 'scan' attribute with the function, so
+    # `import importscan.scan as x` resolves via getattr and yields the
+    # function; sys.modules gives the actual module object.
+    scan_mod = sys.modules["importscan.scan"]
+
+    from .fixtures import package
+
+    mock_file = MagicMock()
+    mock_loader = MagicMock()
+    mock_loader.file = mock_file
+    mock_spec = MagicMock()
+    mock_spec.loader = mock_loader
+    mock_importer = MagicMock()
+    mock_importer.find_spec.return_value = mock_spec
+
+    # patch.object avoids ambiguity from importscan.__init__ re-exporting scan
+    with patch.object(scan_mod, "walk_packages") as mock_wp:
+        mock_wp.return_value = iter(
+            [(mock_importer, "importscan.tests.fixtures.package.module", False)]
+        )
+        with patch.object(scan_mod, "import_module"):
+            scan(package)
+
+    mock_file.close.assert_called_once()
+
+
+class _LoaderUnderscoreGetFilename:
+    def _get_filename(self, modname: str | None = None) -> str:
+        return "some_module.py"
+
+
+class _LoaderGetFilenameTypeError:
+    def get_filename(self, modname: str | None = None) -> str:
+        if modname is not None:
+            raise TypeError
+        return "some_module.py"
+
+
+class _LoaderPycFilename:
+    def get_filename(self, modname: str | None = None) -> str:
+        return "some_module.pyc"
+
+
+def test_import_module_underscore_get_filename() -> None:
+    loader = _LoaderUnderscoreGetFilename()
+    with patch("builtins.__import__"):
+        import_module("somemodule", loader, None)  # type: ignore[arg-type]
+
+
+def test_import_module_get_filename_typeerror() -> None:
+    loader = _LoaderGetFilenameTypeError()
+    with patch("builtins.__import__"):
+        import_module("somemodule", loader, None)  # type: ignore[arg-type]
+
+
+def test_import_module_pyc_skipped() -> None:
+    loader = _LoaderPycFilename()
+    with patch("builtins.__import__") as mock_import:
+        import_module("somemodule", loader, None)  # type: ignore[arg-type]
+    mock_import.assert_not_called()
+
+
+def test_walk_packages_importerror_subpackage() -> None:
+    from .fixtures import importerror_pkg
+
+    with raises(ImportError):
+        scan(importerror_pkg)
+
+
+def test_walk_packages_importerror_subpackage_handle_error() -> None:
+    from .fixtures import importerror_pkg_handle_error
+
+    errors: list[str] = []
+
+    def handle_error(name: str, e: Exception) -> None:
+        errors.append(name)
+
+    scan(importerror_pkg_handle_error, handle_error=handle_error)
+    assert len(errors) == 1
