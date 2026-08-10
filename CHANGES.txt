@@ -4,6 +4,8 @@ CHANGES
 1.0.0 (unreleased)
 ------------------
 
+- Skip importing packages in scan() since they're already imported in walk_packages().
+
 - Add type annotations.
 
 - Add support for Python 3.10 - 3.14.
