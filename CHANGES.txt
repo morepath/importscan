@@ -1,8 +1,10 @@
 CHANGES
 *******
 
-0.3 (unreleased)
-----------------
+1.0.0 (unreleased)
+------------------
+
+- Add type annotations.
 
 - Add support for Python 3.10 - 3.14.
 
@@ -11,6 +13,10 @@ CHANGES
 - Fix Flake8 errors.
 
 - Use GitHub Actions for CI.
+
+- Add tests for 100% coverage.
+
+- Update docs.
 
 
 0.2 (2020-01-29)
