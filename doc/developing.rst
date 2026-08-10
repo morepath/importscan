@@ -8,7 +8,7 @@ Install Importscan for development
 
 Clone Importscan from github::
 
-  $ git clone git@github.com:faassen/importscan.git
+  $ git clone git@github.com:morepath/importscan.git
 
 If this doesn't work and you get an error 'Permission denied (publickey)',
 you need to upload your ssh public key to github_.
@@ -21,15 +21,11 @@ Make sure you have virtualenv_ installed.
 
 Create a new virtualenv for Python 3 inside the importscan directory::
 
-  $ virtualenv -p python3 env/py3
+  $ python -m venv --upgrade-deps .venv
 
 Activate the virtualenv::
 
-  $ source env/py3/bin/activate
-
-Make sure you have recent setuptools and pip installed::
-
-  $ pip install -U setuptools pip
+  $ source .venv/bin/activate
 
 Install the various dependencies and development tools from
 develop_requirements.txt::
@@ -42,9 +38,8 @@ For upgrading the requirements just run the command again.
 
    The following commands work only if you have the virtualenv activated.
 
-.. _github: https://help.github.com/articles/generating-an-ssh-key
-
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
+.. _github: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+.. _virtualenv: https://pypi.org/project/virtualenv
 
 Install pre-commit hook for Black integration
 ---------------------------------------------
@@ -54,7 +49,7 @@ install the `pre-commit hook`_ for Black integration before committing::
 
   $ pre-commit install
 
-.. _`pre-commit hook`: https://black.readthedocs.io/en/stable/version_control_integration.html
+.. _`pre-commit hook`: https://black.readthedocs.io/en/stable/integrations/source_version_control.html
 
 Running the tests
 -----------------
@@ -71,7 +66,7 @@ You can then point your web browser to the ``htmlcov/index.html`` file
 in the project directory and click on modules to see detailed coverage
 information.
 
-.. _`py.test`: http://pytest.org/latest/
+.. _`py.test`: https://pytest.org/latest/
 
 Black
 -----
@@ -115,11 +110,11 @@ To also show cyclomatic complexity, use this command::
 
   $ flake8 --max-complexity=10 importscan
 
-.. _flake8: https://pypi.python.org/pypi/flake8
+.. _flake8: https://pypi.org/project/flake8
 
-.. _pyflakes: https://pypi.python.org/pypi/pyflakes
+.. _pyflakes: https://pypi.org/project/pyflakes
 
-.. _pep8: http://www.python.org/dev/peps/pep-0008/
+.. _pep8: https://peps.python.org/pep-0008
 
 .. _`cyclomatic complexity`: https://en.wikipedia.org/wiki/Cyclomatic_complexity
 
@@ -151,4 +146,4 @@ You can also specify a test environment to run e.g.::
   $ tox -e lint
   $ tox -e coverage
 
-.. _pyenv: https://github.com/yyuu/pyenv
+.. _pyenv: https://github.com/pyenv/pyenv

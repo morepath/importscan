@@ -10,7 +10,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import pkg_resources
+from importlib import metadata
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -24,16 +24,20 @@ import pkg_resources
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.doctest",
+]
 
 autoclass_content = "both"
 
 autodoc_member_order = "groupwise"
 
 intersphinx_mapping = {
-    "reg": ("http://reg.readthedocs.io/en/latest", None),
-    "webob": ("http://docs.webob.org/en/latest", None),
-    "bowerstatic": ("http://bowerstatic.readthedocs.io/en/latest", None),
+    "reg": ("https://reg.readthedocs.io/en/latest", None),
+    "webob": ("https://docs.pylonsproject.org/projects/webob/en/latest", None),
+    "bowerstatic": ("https://bowerstatic.readthedocs.io/en/latest", None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -60,7 +64,28 @@ author = "Martijn Faassen"
 # built documents.
 #
 # The short X.Y version.
-version = pkg_resources.get_distribution("importscan").version
+try:
+    version = metadata.version("importscan")
+except metadata.PackageNotFoundError:
+    # Fallback for ReadTheDocs and other environments where the package isn't installed
+    # Try to get version from pyproject.toml
+    import os
+    import re
+
+    try:
+        pyproject_path = os.path.join(
+            os.path.dirname(__file__), "..", "pyproject.toml"
+        )
+        with open(pyproject_path) as f:
+            content = f.read()
+        # Simple regex to extract version
+        version_match = re.search(r'version\s*=\s*["\']([^"\']+)["\']', content)
+        if version_match:
+            version = version_match.group(1)
+        else:
+            version = "0.0.0"
+    except (FileNotFoundError, Exception):
+        version = "0.0.0"
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -69,7 +94,7 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+# language = None
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -82,7 +107,7 @@ language = None
 exclude_patterns = ["_build"]
 
 # The reST default role (used for this markup: `text`) to use for all
-# documents.
+# documents.n
 # default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -142,7 +167,7 @@ html_theme = "default"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path: list[str] = []
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -209,7 +234,7 @@ htmlhelp_basename = "importscandoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
+latex_elements: dict[str, str] = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
@@ -297,4 +322,4 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"https://docs.python.org/": None}
+# intersphinx_mapping = {"https://docs.python.org/": None}
