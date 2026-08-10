@@ -35,7 +35,7 @@ Changelog = "https://github.com/morepath/importscan/blob/master/CHANGES.txt"
 [project.optional-dependencies]
 test = ["pytest >= 8", "pytest-env"]
 coverage = ["pytest-cov"]
-lint = ["black", "flake8", "flake8-pyproject"]
+lint = ["black", "flake8", "flake8-pyproject", "isort"]
 docs = ["sphinx"]
 mypy = ["mypy", "pytest"]
 pyright = ["pyright", "pytest"]
@@ -159,3 +159,29 @@ commands = [
     ["pyright", "importscan", "--pythonversion", "3.13"],
     ["pyright", "importscan", "--pythonversion", "3.14"],
 ]
+
+[tool.black]
+target-version = ['py310', 'py311', 'py312', 'py313', 'py314']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.git
+    | \.tox
+    | env
+    | venv
+    | .venv
+    | __pycache__
+    | build
+    | dist
+    | src
+  )/
+)
+'''
+
+[tool.isort]
+profile = 'black'
+py_version = 310
+skip_gitignore = true
+extra_standard_library = ["typing_extensions"]
+known_first_party = ["dectate", "importscan", "reg"]

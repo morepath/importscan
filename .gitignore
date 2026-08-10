@@ -10,7 +10,7 @@ pip-wheel-metadata
 
 # Virtualenv
 /env/
-/src/
+/.venv/
 
 # Unit test / coverage reports
 .cache
@@ -20,4 +20,8 @@ htmlcov
 .tox
 
 # Sphinx documentation
+/doc/_build/
 /doc/build/
+
+# Type checkers
+.mypy_cache/
