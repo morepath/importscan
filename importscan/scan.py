@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import sys
 from pkgutil import iter_modules
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable
     from importlib.abc import Loader
     from types import ModuleType
     from typing_extensions import TypeIs
+
     from importscan.types import IgnoreModule, ModuleInfo, StrOrBytesPath
 
 
@@ -107,7 +108,7 @@ def scan(
     if not hasattr(package, "__path__"):
         return
 
-    for importer, modname, ispkg in walk_packages(
+    for importer, modname, _ispkg in walk_packages(
         package.__path__,
         package.__name__ + ".",
         is_ignored=is_ignored,
@@ -125,17 +126,18 @@ def scan(
         #        Also why do we do only use `import_module` here, but not
         #        in `walk_packages`? Doesn't that mean that the additional
         #        check in `import_module` doesn't do anything for packages?
-        loader = importer.find_spec(modname).loader  # type: ignore
+        spec = importer.find_spec(modname, None)
+        loader = spec.loader if spec else None
         assert loader is not None
 
         try:
             import_module(modname, loader, handle_error)
         finally:
             if hasattr(loader, "file") and hasattr(
-                loader.file,  # pyright: ignore[reportAttributeAccessIssue]
+                getattr(loader, "file"),
                 "close",
             ):
-                loader.file.close()  # pyright: ignore[reportAttributeAccessIssue]
+                getattr(loader, "file").close()
 
 
 def import_module(
@@ -143,13 +145,17 @@ def import_module(
     loader: Loader,
     handle_error: Callable[[str, Exception], object] | None,
 ) -> None:
-    get_filename = getattr(loader, "get_filename", None)
+    get_filename: Callable[..., str] | None = getattr(
+        loader, "get_filename", None
+    )
     if get_filename is None:
         get_filename = loader._get_filename  # type: ignore[attr-defined]
     try:
-        fn = get_filename(modname)
+        fn: str = cast(
+            str, get_filename(modname)  # pyright: ignore[reportOptionalCall]
+        )
     except TypeError:
-        fn = get_filename()
+        fn = cast(str, get_filename())  # pyright: ignore[reportOptionalCall]
     # only scan non-orphaned source files and package directories
     if fn.endswith((".pyc", ".pyo", "$py.class")):
         return
