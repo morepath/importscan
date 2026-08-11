@@ -82,7 +82,10 @@ typeCheckingMode = "strict"
 venvPath = "."
 venv = ".venv"
 exclude = [
-  "**/tests/fixtures/**", "**/__pycache__",
+  "**/tests/fixtures/**",
+  "**/__pycache__/**",
+  "**/.venv/**",
+  "**/.tox/**",
 ]
 reportUnnecessaryTypeIgnoreComment = "warning"
 
