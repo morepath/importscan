@@ -73,7 +73,7 @@ Black
 
 To format the code with the `Black Code Formatter`_ run in the root directory::
 
-  $ black morepath
+  $ black importscan
 
 Black has also integration_ for the most popular editors.
 

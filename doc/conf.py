@@ -38,6 +38,7 @@ intersphinx_mapping = {
     "reg": ("https://reg.readthedocs.io/en/latest", None),
     "webob": ("https://docs.pylonsproject.org/projects/webob/en/latest", None),
     "bowerstatic": ("https://bowerstatic.readthedocs.io/en/latest", None),
+    "python": ("https://docs.python.org/3/", None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -73,9 +74,7 @@ except metadata.PackageNotFoundError:
     import re
 
     try:
-        pyproject_path = os.path.join(
-            os.path.dirname(__file__), "..", "pyproject.toml"
-        )
+        pyproject_path = os.path.join(os.path.dirname(__file__), "..", "pyproject.toml")
         with open(pyproject_path) as f:
             content = f.read()
         # Simple regex to extract version
@@ -107,7 +106,7 @@ release = version
 exclude_patterns = ["_build"]
 
 # The reST default role (used for this markup: `text`) to use for all
-# documents.n
+# documents.
 # default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -283,9 +282,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, "importscan", "importscan Documentation", [author], 1)
-]
+man_pages = [(master_doc, "importscan", "importscan Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -303,7 +300,7 @@ texinfo_documents = [
         "importscan Documentation",
         author,
         "importscan",
-        "One line description of project.",
+        "Recursively import modules and sub-packages.",
         "Miscellaneous",
     ),
 ]
@@ -319,7 +316,3 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-# intersphinx_mapping = {"https://docs.python.org/": None}
