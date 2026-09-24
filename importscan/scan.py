@@ -147,17 +147,15 @@ def import_module(
     loader: Loader,
     handle_error: Callable[[str, Exception], object] | None,
 ) -> None:
-    get_filename: Callable[..., str] | None = getattr(
-        loader, "get_filename", None
-    )
+    get_filename: Callable[..., str] | None = getattr(loader, "get_filename", None)
     if get_filename is None:
         get_filename = loader._get_filename  # type: ignore[attr-defined]
     try:
         fn: str = cast(
-            str, get_filename(modname)  # pyright: ignore[reportOptionalCall]
+            "str", get_filename(modname)  # pyright: ignore[reportOptionalCall]
         )
     except TypeError:
-        fn = cast(str, get_filename())  # pyright: ignore[reportOptionalCall]
+        fn = cast("str", get_filename())  # pyright: ignore[reportOptionalCall]
     # only scan non-orphaned source files and package directories
     if fn.endswith((".pyc", ".pyo", "$py.class")):
         return

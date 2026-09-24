@@ -32,9 +32,7 @@ def with_entry_in_sys_path(entry: str) -> Generator[None]:
 
 def zip_file_in_sys_path() -> contextlib.AbstractContextManager[None]:
     """Context manager that puts zipped.zip at head of sys.path"""
-    zip_pkg_path = os.path.join(
-        os.path.dirname(__file__), "fixtures", "zipped.zip"
-    )
+    zip_pkg_path = os.path.join(os.path.dirname(__file__), "fixtures", "zipped.zip")
     return with_entry_in_sys_path(zip_pkg_path)
 
 
