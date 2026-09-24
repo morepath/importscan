@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "importscan"
-version = "0.3.dev0"
+version = "1.0.0.dev0"
 dynamic = ["readme"]
 description = "Recursively import modules and sub-packages"
 license = "BSD-3-Clause"
@@ -14,6 +14,7 @@ maintainers = [{name = "Henri Hulski", email = "henri@sancode.it"}]
 keywords = ["decorator", "import", "package"]
 classifiers = [
     "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -23,6 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
+    "Development Status :: 5 - Production/Stable",
 ]
 requires-python = ">= 3.10"
 
@@ -35,10 +37,16 @@ Changelog = "https://github.com/morepath/importscan/blob/master/CHANGES.txt"
 [project.optional-dependencies]
 test = ["pytest >= 8", "pytest-env"]
 coverage = ["pytest-cov"]
-lint = ["black", "flake8", "flake8-pyproject", "isort"]
-docs = ["sphinx"]
-mypy = ["mypy", "pytest"]
-pyright = ["pyright", "pytest"]
+lint = [
+    "black",
+    "flake8",
+    "flake8-pyproject",
+    "flake8-type-checking",
+    "isort",
+]
+docs = ["sphinx < 9.1"]
+mypy = ["mypy"]
+pyright = ["pyright"]
 
 [tool.setuptools.packages]
 find = {}
@@ -65,11 +73,13 @@ show_missing = true
 [tool.flake8]
 show-source = true
 ignore = ["E203", "E501", "E704", "W503", "W504"]
+extend-select = ["TC", "TC1"]
 max-line-length = 88
 
 [tool.mypy]
 python_version = "3.10"
 strict = true
+files = ["."]
 warn_unreachable = true
 warn_unused_ignores = true
 
@@ -79,13 +89,12 @@ ignore_errors = true
 
 [tool.pyright]
 typeCheckingMode = "strict"
-venvPath = "."
-venv = ".venv"
 exclude = [
   "**/tests/fixtures/**",
-  "**/__pycache__/**",
-  "**/.venv/**",
-  "**/.tox/**",
+  "__pycache__",
+  ".venv",
+  "**/.*",
+  "**/node_modules",
 ]
 reportUnnecessaryTypeIgnoreComment = "warning"
 
@@ -102,7 +111,7 @@ env_list = [
     "pre-commit",
     "docs",
     "mypy",
-    "pyright"
+    "pyright",
 ]
 skip_missing_interpreters = true
 
@@ -111,7 +120,7 @@ skip_missing_interpreters = true
 "3.11" = ["py311"]
 "3.12" = ["py312"]
 "3.13" = ["py313"]
-"3.14" = ["py314", "pre-commit", "coverage"]
+"3.14" = ["py314", "pre-commit", "coverage", "mypy", "pyright"]
 "pypy-3.11" = ["pypy3"]
 
 [tool.tox.env_run_base]
@@ -123,7 +132,7 @@ commands = [["pytest", "{posargs:importscan}"]]
 base_python = ["python3"]
 extras = ["test", "coverage"]
 commands = [
-    ["pytest", "--cov", "--cov-fail-under=88", "{posargs:importscan}"],
+    ["pytest", "--cov", "--cov-fail-under=100", "{posargs:importscan}"],
 ]
 
 [tool.tox.env.pre-commit]
@@ -145,22 +154,22 @@ commands = [
 base_python = ["python3"]
 extras = ["mypy"]
 commands = [
-    ["mypy", "-p", "importscan", "--python-version", "3.10"],
-    ["mypy", "-p", "importscan", "--python-version", "3.11"],
-    ["mypy", "-p", "importscan", "--python-version", "3.12"],
-    ["mypy", "-p", "importscan", "--python-version", "3.13"],
-    ["mypy", "-p", "importscan", "--python-version", "3.14"],
+    ["mypy", "--python-version", "3.10"],
+    ["mypy", "--python-version", "3.11"],
+    ["mypy", "--python-version", "3.12"],
+    ["mypy", "--python-version", "3.13"],
+    ["mypy", "--python-version", "3.14"],
 ]
 
 [tool.tox.env.pyright]
 base_python = ["python3"]
 extras = ["pyright"]
 commands = [
-    ["pyright", "importscan", "--pythonversion", "3.10"],
-    ["pyright", "importscan", "--pythonversion", "3.11"],
-    ["pyright", "importscan", "--pythonversion", "3.12"],
-    ["pyright", "importscan", "--pythonversion", "3.13"],
-    ["pyright", "importscan", "--pythonversion", "3.14"],
+    ["pyright", "--pythonversion", "3.10"],
+    ["pyright", "--pythonversion", "3.11"],
+    ["pyright", "--pythonversion", "3.12"],
+    ["pyright", "--pythonversion", "3.13"],
+    ["pyright", "--pythonversion", "3.14"],
 ]
 
 [tool.black]
@@ -177,7 +186,6 @@ exclude = '''
     | __pycache__
     | build
     | dist
-    | src
   )/
 )
 '''

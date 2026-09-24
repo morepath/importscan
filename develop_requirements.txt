@@ -2,7 +2,6 @@
 -e '.[test,coverage,lint,docs,mypy,pyright]'
 pre-commit
 tox >= 4
-radon
 
 # releaser
 zest.releaser[recommended]
