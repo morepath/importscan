@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Callable, Generator, Iterable  # noqa: TC003
 from pkgutil import iter_modules
+from types import ModuleType  # noqa: TC003
 from typing import TYPE_CHECKING, cast
 
-if TYPE_CHECKING:
-    from collections.abc import Callable, Generator, Iterable
-    from importlib.abc import Loader
-    from types import ModuleType
-    from typing_extensions import TypeIs
+from importscan.types import IgnoreModule, ModuleInfo, StrOrBytesPath  # noqa: TC001
 
-    from importscan.types import IgnoreModule, ModuleInfo, StrOrBytesPath
+if TYPE_CHECKING:
+    from importlib.abc import Loader
+    from typing_extensions import TypeIs
 
 
 def scan(
