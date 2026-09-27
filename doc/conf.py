@@ -10,7 +10,14 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-from importlib import metadata
+import collections.abc
+import sys
+from importlib import machinery, metadata
+from os import PathLike
+from types import ModuleType
+from typing import Any
+
+import importscan.types
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -316,3 +323,31 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+# Doc-build-only shim. These names are TYPE_CHECKING-only in the
+# library (zero runtime import cost). The custom aliases in
+# importscan/types.py are stored as *strings* at runtime (so
+# IgnoreModule/StrOrBytesPath never crash on import) rather than
+# real objects — so instead of patching those strings through
+# (typing's forward-ref recursion on nested strings turned out too
+# fragile to rely on), we build the real equivalent objects here,
+# once, and patch those in directly. Never runs for library users.
+
+# This workaround is needed because "importscan.scan" otherwise is imported as a function.
+scan_module: Any = sys.modules["importscan.scan"]
+
+importscan.types.Callable = collections.abc.Callable
+importscan.types.Sequence = collections.abc.Sequence
+importscan.types.ModuleSpec = machinery.ModuleSpec
+importscan.types.PathLike = PathLike
+importscan.types.ModuleType = ModuleType
+
+_real_IgnoreModuleCallback = collections.abc.Callable[[str], object]
+importscan.types.IgnoreModuleCallback = _real_IgnoreModuleCallback
+importscan.types.IgnoreModule = str | _real_IgnoreModuleCallback
+importscan.types.StrOrBytesPath = PathLike[str] | PathLike[bytes] | str | bytes
+
+scan_module.ModuleType = ModuleType
+scan_module.Iterable = collections.abc.Iterable
+scan_module.Callable = collections.abc.Callable
+scan_module.IgnoreModule = importscan.types.IgnoreModule

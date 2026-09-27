@@ -26,7 +26,7 @@ class PathEntryFinderProtocol(Protocol):
 
 
 IgnoreModuleCallback: TypeAlias = "Callable[[str], object]"
-IgnoreModule: TypeAlias = str | IgnoreModuleCallback
+IgnoreModule: TypeAlias = "str | IgnoreModuleCallback"  # noqa: TC008
 ModuleFinder: TypeAlias = MetaPathFinderProtocol | PathEntryFinderProtocol
 ModuleInfo: TypeAlias = tuple[ModuleFinder, str, bool]
 StrOrBytesPath: TypeAlias = "PathLike[str] | PathLike[bytes] | str | bytes"
