@@ -54,19 +54,19 @@ install the `pre-commit hook`_ for Black integration before committing::
 Running the tests
 -----------------
 
-You can run the tests using `py.test`_::
+You can run the tests using `pytest`_::
 
-  $ py.test
+  $ pytest
 
 To generate test coverage information as HTML do::
 
-  $ py.test --cov --cov-report html
+  $ pytest --cov --cov-report html
 
 You can then point your web browser to the ``htmlcov/index.html`` file
 in the project directory and click on modules to see detailed coverage
 information.
 
-.. _`py.test`: https://pytest.org/latest/
+.. _`pytest`: https://pytest.org
 
 Black
 -----
@@ -80,27 +80,11 @@ Black has also integration_ for the most popular editors.
 .. _`Black Code Formatter`: https://black.readthedocs.io
 .. _integration: https://black.readthedocs.io/en/stable/editor_integration.html
 
-Building the HTML documentation
--------------------------------
-
-To build the HTML documentation (output in ``doc/build/html``), run::
-
-  $ sphinx-build doc doc/build/html
-
-Or alternatively if you have ``Make`` installed::
-
-  $ cd doc
-  $ make html
-
-Or from the Importscan project directory::
-
-  $ make -C doc html
-
-Various checking tools
-----------------------
+flake8
+------
 
 flake8_ is a tool that can do various checks for common Python
-mistakes using pyflakes_, check for PEP8_ style compliance and
+mistakes using pyflakes_, checks for PEP8_ style compliance and
 can do `cyclomatic complexity`_ checking. To do pyflakes and pep8
 checking do::
 
@@ -118,21 +102,56 @@ To also show cyclomatic complexity, use this command::
 
 .. _`cyclomatic complexity`: https://en.wikipedia.org/wiki/Cyclomatic_complexity
 
+
+Running the documentation tests
+-------------------------------
+
+The documentation contains code. To check these code snippets, you
+can run this code using this command::
+
+  (py3) $ sphinx-build -b doctest doc doc/build/doctest
+
+Or alternatively if you have ``Make`` installed::
+
+  (py3) $ cd doc
+  (py3) $ make doctest
+
+Or from the Dectate project directory::
+
+  (py3) $ make -C doc doctest
+
+Building the HTML documentation
+-------------------------------
+
+To build the HTML documentation (output in ``doc/_build/html``), run::
+
+  $ sphinx-build doc doc/_build/html
+
+Or alternatively if you have ``Make`` installed::
+
+  $ cd doc
+  $ make html
+
+Or from the Dectate project directory::
+
+  $ make -C doc html
+
 Tox
 ---
 
-With tox you can test Morepath under different Python environments.
+With tox you can test Importscan under different Python environments.
 
-We have Travis continuous integration installed on Morepath's github
+We have gh-actions continuous integration installed on Importscan's github
 repository and it runs the same tox tests after each checkin.
 
 First you should install all Python versions which you want to
 test. The versions which are not installed will be skipped. You should
-at least install Python 3.7 which is required by flake8 and coverage tests.
+at least install Python 3.14 which is required by flake8, coverage,
+doctests, mypy and pyright.
 
 One tool you can use to install multiple versions of Python is pyenv_.
 
-To find out which test environments are defined for Morepath in tox.ini run::
+To find out which test environments are defined for Importscan in tox.ini run::
 
   $ tox -l
 
