@@ -6,19 +6,47 @@ CHANGES
 
 - Skip importing packages in scan() since they're already imported in walk_packages().
 
-- Add type annotations.
+- Add type annotations and integrate ``mypy`` and ``pyright``.
 
-- Add support for Python 3.10 - 3.14.
+- Switch to ``pyproject.toml`` based project setup.
 
-- Drop support for Python 3.9 and below.
+- Add support for Python 3.11 - 3.15.
 
-- Fix Flake8 errors.
+- Drop support for Python 3.10 and below.
+
+- Support Pypy 3.12.
+
+- Fix linting errors.
 
 - Use GitHub Actions for CI.
 
 - Add tests for 100% coverage.
 
-- Update docs.
+- Update docs and adjust sphinx config.
+
+- Make an overall cleanup.
+
+- Fix readthedocs integration.
+
+- Replace flake8, black, isort, pyupgrade and pre-commit with Ruff_.
+
+  .. _Ruff: https://docs.astral.sh/ruff
+
+- Remove coveralls integration.
+
+- Adjust the deployment strategy:
+  
+  * Move the Pypi upload from ``zest.release`` to ``gh-actions``.
+
+  * Use ``v`` + version as release tags like ``v1.0.0``.
+
+  * So we still use ``zest.release`` but without publishing to Pypi.
+    The Pypi upload is triggered by pushing the new release tag to GitHub.
+    This happens in the Release workflow in ``.github/workflows/release.yml``.
+    With this workflow we get Trusted Publishing with short-lived OIDC tokens
+    that PyPI issues to one specific repository, workflow file and environment (``pypi``).
+    We also get PEP 740 provenance and can set required reviewers for the environment
+    and a ruleset who can create release tags and trigger releases.
 
 
 0.2 (2020-01-29)
