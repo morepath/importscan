@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable
     from importlib.abc import Loader
     from types import ModuleType
+
     from typing_extensions import TypeIs
 
     from importscan.types import IgnoreModule, ModuleInfo, StrOrBytesPath
@@ -152,7 +153,8 @@ def import_module(
         get_filename = loader._get_filename  # type: ignore[attr-defined]
     try:
         fn: str = cast(
-            "str", get_filename(modname)  # pyright: ignore[reportOptionalCall]
+            "str",
+            get_filename(modname),  # pyright: ignore[reportOptionalCall]
         )
     except TypeError:
         fn = cast("str", get_filename())  # pyright: ignore[reportOptionalCall]
@@ -258,7 +260,6 @@ def walk_packages(
 
     # iter_modules is nonrecursive
     for module_finder, name, ispkg in iter_modules(path, prefix):
-
         if is_ignored is not None and is_ignored(name):
             # if name is a package, ignoring here causes
             # all subpackages and submodules to be ignored too
