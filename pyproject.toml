@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "importscan"
-version = "1.0.0"
+version = "1.0.1.dev0"
 dynamic = ["readme"]
 description = "Recursively import modules and sub-packages"
 license = "BSD-3-Clause"
