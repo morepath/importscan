@@ -168,5 +168,6 @@ commands = [
 ]
 
 [tool.zest-releaser]
+release = false
 upload-pypi = false
 tag-format = "v{version}"
