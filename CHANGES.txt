@@ -1,7 +1,7 @@
 CHANGES
 *******
 
-1.0.0 (unreleased)
+1.0.0 (2026-10-10)
 ------------------
 
 - Skip importing packages in scan() since they're already imported in walk_packages().
