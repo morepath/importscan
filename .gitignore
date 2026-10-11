@@ -13,8 +13,6 @@ pip-wheel-metadata
 /.venv/
 
 # Unit test / coverage reports
-.cache
-.pytest_cache
 .coverage
 htmlcov
 .tox
@@ -23,5 +21,6 @@ htmlcov
 /doc/_build/
 /doc/build/
 
-# Type checkers
-.mypy_cache/
+# Caches
+.cache
+.*_cache
