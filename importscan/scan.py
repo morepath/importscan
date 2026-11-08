@@ -186,18 +186,21 @@ def get_is_ignored(
         return hasattr(v, "__iter__")
 
     if ignore is None:
-        ignore = []
+        ignores: list[IgnoreModule] = []
     elif not is_nonstr_iter(ignore):
-        ignore = [ignore]
+        ignores = [ignore]
+    else:
+        # materialize one-shot iterables: the rules are inspected twice below
+        ignores = list(ignore)
 
     # non-leading-dotted name absolute object name
-    str_ignores = [ign for ign in ignore if isinstance(ign, str)]
+    str_ignores = [ign for ign in ignores if isinstance(ign, str)]
     # leading dotted name relative to scanned package
     rel_ignores = [ign for ign in str_ignores if ign.startswith(".")]
     # non-leading dotted names
     abs_ignores = [ign for ign in str_ignores if not ign.startswith(".")]
     # functions, e.g. re.compile('pattern').search
-    callable_ignores = [ign for ign in ignore if callable(ign)]
+    callable_ignores = [ign for ign in ignores if callable(ign)]
 
     def is_ignored(fullname: str) -> bool:
         for ign in rel_ignores:
