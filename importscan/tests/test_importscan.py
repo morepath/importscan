@@ -108,6 +108,14 @@ def test_ignore_module_function() -> None:
     assert fixtures.calls == 0
 
 
+def test_ignore_module_function_in_iterator() -> None:
+    from .fixtures import ignore_module_function
+
+    scan(ignore_module_function, ignore=iter([re.compile("module$").search]))
+
+    assert fixtures.calls == 0
+
+
 def test_ignore_subpackage_relative() -> None:
     from .fixtures import ignore_subpackage
 
